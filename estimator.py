@@ -23,7 +23,7 @@ import pulsar_data
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--batch_size', default=100, type=int, help='batch size')
+parser.add_argument('--batch_size', default=10000, type=int, help='batch size')
 parser.add_argument('--train_steps', default=1000, type=int,
                     help='number of training steps')
 
@@ -32,7 +32,7 @@ def main(argv):
     args = parser.parse_args(argv[1:])
 
     # Fetch the data
-    (train_x, train_y), (test_x, test_y) = pulsar_data.load_data()
+    (train_x, train_y), (test_x, test_y) = pulsar_data.load_random_data()
 
     # Feature columns describe how to use the input.
     my_feature_columns = []
@@ -44,7 +44,6 @@ def main(argv):
         feature_columns=my_feature_columns,
         # Two hidden layers of 10 nodes each.
         hidden_units=[5],
-        # The model must choose between 3 classes.
         n_classes=2)
 
     # Train the Model.

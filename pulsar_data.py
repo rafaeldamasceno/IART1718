@@ -1,11 +1,15 @@
 import tensorflow as tf
 import pandas as pd
+import numpy as np
 
 TRAIN_PATH = "train.csv"
 TEST_PATH = "test.csv"
+FULL_PATH = "HTRU_2.csv"
+TRAIN_SAMPLE = 0.8
 
 CSV_COLUMN_NAMES = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 CLASS = ['NotPulsar', 'Pulsar']
+
 
 def load_data(y_name='9'):
     train = pd.read_csv(TRAIN_PATH, names=CSV_COLUMN_NAMES, header=0)
@@ -16,7 +20,21 @@ def load_data(y_name='9'):
 
     return (train_x, train_y), (test_x, test_y)
 
-    
+
+def load_random_data(y_name='9'):
+    data = pd.read_csv(FULL_PATH, names=CSV_COLUMN_NAMES, header=0)
+    data = data.apply(np.random.permutation)
+    train_size = int(TRAIN_SAMPLE * data.shape[0])
+
+    train = data.iloc[:train_size]
+    test = data.iloc[train_size:]
+
+    train_x, train_y = train, train.pop(y_name)
+    test_x, test_y = test, test.pop(y_name)
+
+    return (train_x, train_y), (test_x, test_y)
+
+
 def train_input_fn(features, labels, batch_size):
     """An input function for training"""
     # Convert the inputs to a Dataset.
@@ -31,7 +49,7 @@ def train_input_fn(features, labels, batch_size):
 
 def eval_input_fn(features, labels, batch_size):
     """An input function for evaluation or prediction"""
-    features=dict(features)
+    features = dict(features)
     if labels is None:
         # No labels, use only features.
         inputs = features
@@ -55,6 +73,7 @@ def eval_input_fn(features, labels, batch_size):
 # `tf.parse_csv` sets the types of the outputs to match the examples given in
 #     the `record_defaults` argument.
 CSV_TYPES = [[0.0], [0.0], [0.0], [0.0], [0.0], [0.0], [0.0], [0.0], [0]]
+
 
 def _parse_line(line):
     # Decode the line into its fields
