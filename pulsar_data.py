@@ -2,28 +2,25 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 
-TRAIN_PATH = "train.csv"
-TEST_PATH = "test.csv"
-FULL_PATH = "HTRU_2.csv"
+DATASET_PATH = "HTRU_2.csv"
 TRAIN_SAMPLE = 0.8
 
-CSV_COLUMN_NAMES = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-CLASS = ['NotPulsar', 'Pulsar']
+CSV_COLUMN_NAMES = ['Profile_mean',
+                    'Profile_stdev',
+                    'Profile_skewness',
+                    'Profile_kurtosis',
+                    'DM_mean',
+                    'DM_stdev',
+                    'DM_skewness',
+                    'DM_kurtosis',
+                    'class']
+CLASS = ['Negative', 'Positive']
 
 
-def load_data(y_name='9'):
-    train = pd.read_csv(TRAIN_PATH, names=CSV_COLUMN_NAMES, header=0)
-    train_x, train_y = train, train.pop(y_name)
-
-    test = pd.read_csv(TEST_PATH, names=CSV_COLUMN_NAMES, header=0)
-    test_x, test_y = test, test.pop(y_name)
-
-    return (train_x, train_y), (test_x, test_y)
-
-
-def load_random_data(y_name='9'):
-    data = pd.read_csv(FULL_PATH, names=CSV_COLUMN_NAMES, header=0)
-    data = data.apply(np.random.permutation)
+def load_data(y_name='class', random=False):
+    data = pd.read_csv(DATASET_PATH, names=CSV_COLUMN_NAMES, header=0)
+    if random:
+        data = data.apply(np.random.permutation)
     train_size = int(TRAIN_SAMPLE * data.shape[0])
 
     train = data.iloc[:train_size]
@@ -83,7 +80,7 @@ def _parse_line(line):
     features = dict(zip(CSV_COLUMN_NAMES, fields))
 
     # Separate the label from the features
-    label = features.pop('9')
+    label = features.pop('class')
 
     return features, label
 

@@ -23,7 +23,7 @@ import pulsar_data
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--batch_size', default=10000, type=int, help='batch size')
+parser.add_argument('--batch_size', default=100, type=int, help='batch size')
 parser.add_argument('--train_steps', default=1000, type=int,
                     help='number of training steps')
 
@@ -32,7 +32,7 @@ def main(argv):
     args = parser.parse_args(argv[1:])
 
     # Fetch the data
-    (train_x, train_y), (test_x, test_y) = pulsar_data.load_random_data()
+    (train_x, train_y), (test_x, test_y) = pulsar_data.load_data()
 
     # Feature columns describe how to use the input.
     my_feature_columns = []
@@ -43,7 +43,7 @@ def main(argv):
     classifier = tf.estimator.DNNClassifier(
         feature_columns=my_feature_columns,
         # Two hidden layers of 10 nodes each.
-        hidden_units=[5],
+        hidden_units=[6],
         n_classes=2)
 
     # Train the Model.
@@ -60,16 +60,16 @@ def main(argv):
     print('\nTest set accuracy: {accuracy:0.3f}\n'.format(**eval_result))
 
     # Generate predictions from the model
-    expected = ['NotPulsar', 'Pulsar']
+    expected = ['Negative', 'Positive']
     predict_x = {
-        '1': [141.1875, 16.25],
-        '2': [39.60937192, 33.43276836],
-        '3': [-0.172315843, 5.908288243],
-        '4': [0.997104608, 36.05141332],
-        '5': [2.731605351, 149.9021739],
-        '6': [19.39785108, 71.8878467],
-        '7': [8.826834558, -0.21893998],
-        '8': [85.66471835, -1.085186937]
+        'Profile_mean': [141.1875, 16.25],
+        'Profile_stdev': [39.60937192, 33.43276836],
+        'Profile_skewness': [-0.172315843, 5.908288243],
+        'Profile_kurtosis': [0.997104608, 36.05141332],
+        'DM_mean': [2.731605351, 149.9021739],
+        'DM_stdev': [19.39785108, 71.8878467],
+        'DM_skewness': [8.826834558, -0.21893998],
+        'DM_kurtosis': [85.66471835, -1.085186937]
     }
 
     predictions = classifier.predict(
