@@ -32,7 +32,7 @@ def main(argv):
     args = parser.parse_args(argv[1:])
 
     # Fetch the data
-    (train_x, train_y), (test_x, test_y) = pulsar_data.load_data()
+    (train_x, train_y), (test_x, test_y) = pulsar_data.load_data(random=True)
 
     # Feature columns describe how to use the input.
     my_feature_columns = []
@@ -62,14 +62,14 @@ def main(argv):
     # Generate predictions from the model
     expected = ['Negative', 'Positive']
     predict_x = {
-        'Profile_mean': [141.1875, 16.25],
-        'Profile_stdev': [39.60937192, 33.43276836],
-        'Profile_skewness': [-0.172315843, 5.908288243],
-        'Profile_kurtosis': [0.997104608, 36.05141332],
-        'DM_mean': [2.731605351, 149.9021739],
-        'DM_stdev': [19.39785108, 71.8878467],
-        'DM_skewness': [8.826834558, -0.21893998],
-        'DM_kurtosis': [85.66471835, -1.085186937]
+        'Profile_mean': [141.1875, 99.3671875],
+        'Profile_stdev': [39.60937192, 41.57220208],
+        'Profile_skewness': [-0.172315843, 1.547196967],
+        'Profile_kurtosis': [0.997104608, 4.154106043],
+        'DM_mean': [2.731605351, 27.55518395],
+        'DM_stdev': [19.39785108, 61.71901588],
+        'DM_skewness': [8.826834558, 2.20880796],
+        'DM_kurtosis': [85.66471835, 3.662680136]
     }
 
     predictions = classifier.predict(
