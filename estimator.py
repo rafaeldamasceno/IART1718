@@ -57,9 +57,6 @@ def main(argv):
     TRAIN_STEPS = train_x.shape[0]
     BATCH_SIZE= int(TRAIN_STEPS * 0.1)
 
-    NODES = int(train_x.shape[1] * 1.5)
-    HIDDEN_LAYERS = 3 * [NODES]
-
     # Feature columns describe how to use the input.
     my_feature_columns = []
     for key in train_x.keys():
@@ -69,7 +66,7 @@ def main(argv):
         model_fn=my_model,
         params={
             'feature_columns': my_feature_columns,
-            'hidden_units': HIDDEN_LAYERS,
+            'hidden_units': 3 *[int(train_x.shape[1] * 1.5)],
             'n_classes': 2,
         })
 
