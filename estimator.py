@@ -66,7 +66,7 @@ def main(argv):
         model_fn=my_model,
         params={
             'feature_columns': my_feature_columns,
-            'hidden_units': 3 *[int(train_x.shape[1] * 1.5)],
+            'hidden_units': 3 * [int(train_x.shape[1] * 1.5)],
             'n_classes': 2,
         })
 
