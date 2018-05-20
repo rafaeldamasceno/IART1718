@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 DATASET_PATH = "HTRU_2.csv"
-TRAIN_SAMPLE = 0.6
+TRAIN_SAMPLE = 0.8
 
 CSV_COLUMN_NAMES = ['Profile_mean',
                     'Profile_stdev',
