@@ -52,7 +52,7 @@ def my_model(features, labels, mode, params):
 def main(argv):
 
     # Fetch the data
-    (train_x, train_y), (test_x, test_y) = pulsar_data.load_data(random=False, balance_class=0, normalize=False)
+    (train_x, train_y), (test_x, test_y) = pulsar_data.load_data(random=True, balance_class=0, normalize=False)
 
     TRAIN_STEPS = train_x.shape[0]
     BATCH_SIZE= int(TRAIN_STEPS * 0.1)
