@@ -17,13 +17,37 @@ CSV_COLUMN_NAMES = ['Profile_mean',
 CLASS = ['Negative', 'Positive']
 
 
-def load_data(y_name='class', random=False):
-    data = pd.read_csv(DATASET_PATH, names=CSV_COLUMN_NAMES, header=0)
+def load_data(y_name='class', random=False, balance_class=False, normalize=False):
+    data = pd.read_csv(DATASET_PATH, names=CSV_COLUMN_NAMES, header=None)
+
+    if normalize:
+        norm = (data - data.mean()) / data.std()
+        norm['class'] = data['class']
+        data = norm
+    print(data)
     if random:
         data = data.apply(np.random.permutation)
+
+    if balance_class:
+        negative_count = data.groupby('class').size()[0]
+        positive_count = data.groupby('class').size()[1]
+        print(positive_count)
+        for index, row in data.iterrows():
+            if (not row['class']):
+                data = data.drop(index)
+                negative_count -= 1
+            if (negative_count == positive_count):
+                break
+        print(negative_count)
+        data = data.apply(np.random.permutation)
+
     train_size = int(TRAIN_SAMPLE * data.shape[0])
 
+    print(data.shape)
+    print(train_size)
+
     train = data.iloc[:train_size]
+    print(train)
     test = data.iloc[train_size:]
 
     train_x, train_y = train, train.pop(y_name)
@@ -59,41 +83,6 @@ def eval_input_fn(features, labels, batch_size):
     # Batch the examples
     assert batch_size is not None, "batch_size must not be None"
     dataset = dataset.batch(batch_size)
-
-    # Return the dataset.
-    return dataset
-
-
-# The remainder of this file contains a simple example of a csv parser,
-#     implemented using a the `Dataset` class.
-
-# `tf.parse_csv` sets the types of the outputs to match the examples given in
-#     the `record_defaults` argument.
-CSV_TYPES = [[0.0], [0.0], [0.0], [0.0], [0.0], [0.0], [0.0], [0.0], [0]]
-
-
-def _parse_line(line):
-    # Decode the line into its fields
-    fields = tf.decode_csv(line, record_defaults=CSV_TYPES)
-
-    # Pack the result into a dictionary
-    features = dict(zip(CSV_COLUMN_NAMES, fields))
-
-    # Separate the label from the features
-    label = features.pop('class')
-
-    return features, label
-
-
-def csv_input_fn(csv_path, batch_size):
-    # Create a dataset containing the text lines.
-    dataset = tf.data.TextLineDataset(csv_path).skip(1)
-
-    # Parse each line.
-    dataset = dataset.map(_parse_line)
-
-    # Shuffle, repeat, and batch the examples.
-    dataset = dataset.shuffle(1000).repeat().batch(batch_size)
 
     # Return the dataset.
     return dataset
