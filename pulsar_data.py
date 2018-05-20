@@ -24,30 +24,24 @@ def load_data(y_name='class', random=False, balance_class=False, normalize=False
         norm = (data - data.mean()) / data.std()
         norm['class'] = data['class']
         data = norm
-    print(data)
+
     if random:
         data = data.apply(np.random.permutation)
 
     if balance_class:
         negative_count = data.groupby('class').size()[0]
         positive_count = data.groupby('class').size()[1]
-        print(positive_count)
         for index, row in data.iterrows():
             if (not row['class']):
                 data = data.drop(index)
                 negative_count -= 1
-            if (negative_count == positive_count):
+            if (negative_count == positive_count * balance_class):
                 break
-        print(negative_count)
         data = data.apply(np.random.permutation)
 
     train_size = int(TRAIN_SAMPLE * data.shape[0])
 
-    print(data.shape)
-    print(train_size)
-
     train = data.iloc[:train_size]
-    print(train)
     test = data.iloc[train_size:]
 
     train_x, train_y = train, train.pop(y_name)
@@ -62,7 +56,7 @@ def train_input_fn(features, labels, batch_size):
     dataset = tf.data.Dataset.from_tensor_slices((dict(features), labels))
 
     # Shuffle, repeat, and batch the examples.
-    dataset = dataset.shuffle(1000).repeat().batch(batch_size)
+    dataset = dataset.shuffle(batch_size).repeat().batch(batch_size)
 
     # Return the dataset.
     return dataset
