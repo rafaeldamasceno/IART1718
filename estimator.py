@@ -30,7 +30,7 @@ def my_model(features, labels, mode, params):
     if mode == tf.estimator.ModeKeys.PREDICT:
         predictions = {
             'class_ids': predicted_classes[:, tf.newaxis],
-            'probabilities': tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits),
+            'probabilities': tf.nn.softmax(logits),
             'logits': logits,
         }
         return tf.estimator.EstimatorSpec(mode, predictions=predictions)
