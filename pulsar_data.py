@@ -17,7 +17,7 @@ CSV_COLUMN_NAMES = ['Profile_mean',
 CLASS = ['Negative', 'Positive']
 
 
-def load_data(y_name='class', random=False, balance_class=False, normalize=False):
+def load_data(y_name='class', random=False, balance_weight=False, normalize=False):
     data = pd.read_csv(DATASET_PATH, names=CSV_COLUMN_NAMES, header=None)
 
     if normalize:
@@ -28,14 +28,14 @@ def load_data(y_name='class', random=False, balance_class=False, normalize=False
     if random:
         data = data.apply(np.random.permutation)
 
-    if balance_class:
+    if balance_weight:
         negative_count = data.groupby('class').size()[0]
         positive_count = data.groupby('class').size()[1]
         for index, row in data.iterrows():
             if (not row['class']):
                 data = data.drop(index)
                 negative_count -= 1
-            if (negative_count == positive_count * balance_class):
+            if (negative_count == positive_count * balance_weight):
                 break
         data = data.apply(np.random.permutation)
 

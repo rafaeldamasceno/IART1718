@@ -9,10 +9,18 @@ from math import sqrt
 
 import pulsar_data
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--layers', default=3, type=int, help='number of intermediate layers')
+parser.add_argument('--nodes', default=12, type=int,
+                    help='number of nodes per layer')
+parser.add_argument('--random', default=False, type=bool, help='randomize dataset')
+parser.add_argument('--balance_weight', default=0, type=float, help='balance weight')
+parser.add_argument('--normalize', default=False, type=int, help='normalize dataset')
+
 def my_model(features, labels, mode, params):
     net = tf.feature_column.input_layer(features, params['feature_columns'])
     for units in params['hidden_units']:
-        net = tf.layers.dense(net, units=units, activation=tf.nn.selu)
+        net = tf.layers.dense(net, units=units, activation=tf.nn.relu)
 
     # Compute logits (1 per class).
     logits = tf.layers.dense(net, params['n_classes'], activation=None)
@@ -22,7 +30,7 @@ def my_model(features, labels, mode, params):
     if mode == tf.estimator.ModeKeys.PREDICT:
         predictions = {
             'class_ids': predicted_classes[:, tf.newaxis],
-            'probabilities': tf.nn.softmax(logits),
+            'probabilities': tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits),
             'logits': logits,
         }
         return tf.estimator.EstimatorSpec(mode, predictions=predictions)
@@ -51,8 +59,10 @@ def my_model(features, labels, mode, params):
 
 def main(argv):
 
+    args = parser.parse_args(argv[1:])
+
     # Fetch the data
-    (train_x, train_y), (test_x, test_y) = pulsar_data.load_data(random=True, balance_class=0, normalize=False)
+    (train_x, train_y), (test_x, test_y) = pulsar_data.load_data(random=args.random, balance_weight=args.balance_weight, normalize=args.normalize)
 
     TRAIN_STEPS = train_x.shape[0]
     BATCH_SIZE= int(TRAIN_STEPS * 0.1)
@@ -66,7 +76,7 @@ def main(argv):
         model_fn=my_model,
         params={
             'feature_columns': my_feature_columns,
-            'hidden_units': int(argv[1]) * [int(argv[2])],
+            'hidden_units': args.layers * [args.nodes],
             'n_classes': 2,
         })
 
