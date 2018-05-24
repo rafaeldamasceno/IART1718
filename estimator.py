@@ -15,7 +15,7 @@ parser.add_argument('--nodes', default=12, type=int,
                     help='number of nodes per layer')
 parser.add_argument('--random', default=False, type=bool, help='randomize dataset')
 parser.add_argument('--balance_weight', default=0, type=float, help='balance weight')
-parser.add_argument('--normalize', default=False, type=int, help='normalize dataset')
+parser.add_argument('--normalize', default=False, type=bool, help='normalize dataset')
 
 def my_model(features, labels, mode, params):
     net = tf.feature_column.input_layer(features, params['feature_columns'])
