@@ -2,6 +2,8 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 
+from sklearn.model_selection import train_test_split
+
 DATASET_PATH = "HTRU_2.csv"
 TRAIN_SAMPLE = 0.8
 
@@ -25,10 +27,8 @@ def load_data(y_name='class', random=False, balance_weight=False, normalize=Fals
         norm['class'] = data['class']
         data = norm
 
-    if random:
-        data = data.apply(np.random.permutation)
-
     if balance_weight:
+        data = data.apply(np.random.permutation)
         negative_count = data.groupby('class').size()[0]
         positive_count = data.groupby('class').size()[1]
         for index, row in data.iterrows():
@@ -37,12 +37,8 @@ def load_data(y_name='class', random=False, balance_weight=False, normalize=Fals
                 negative_count -= 1
             if (negative_count == positive_count * balance_weight):
                 break
-        data = data.apply(np.random.permutation)
 
-    train_size = int(TRAIN_SAMPLE * data.shape[0])
-
-    train = data.iloc[:train_size]
-    test = data.iloc[train_size:]
+    train, test = train_test_split(data, test_size=1-TRAIN_SAMPLE, shuffle=random)
 
     train_x, train_y = train, train.pop(y_name)
     test_x, test_y = test, test.pop(y_name)
